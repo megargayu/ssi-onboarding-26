@@ -1,0 +1,13 @@
+"""Bazel build configuration settings for SSI Onboarding '26
+
+Defines config_setting targets used in select() blocks throughout the build
+to conditionally include hardware drivers vs mock implementations.
+"""
+
+package(default_visibility = ["//visibility:public"])
+
+# Raspberry Pi Pico development profile
+config_setting(
+    name = "pico_profile",
+    define_values = {"profile": "pico"},
+)

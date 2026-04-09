@@ -1,0 +1,33 @@
+# SSI Onboarding '26 - Bazel Configuration
+# Build configurations for different hardware profiles and build types
+
+# ============================================================================
+# Common Settings
+# ============================================================================
+
+# Set C/C++ language standards
+build --cxxopt=-std=gnu++2x
+build --conlyopt=-std=gnu2x
+
+# Show detailed build information
+build --verbose_failures
+build --announce_rc
+
+# Enable color output
+common --color=yes
+
+# Cache build results
+build --disk_cache=~/.cache/bazel
+
+# ============================================================================
+# Build Profile Configurations
+# ============================================================================
+
+build:pico --define=profile=pico
+build:pico --platforms=//platforms:arm_cortex_m33_platform
+build:pico --compilation_mode=dbg
+build:pico --copt=-Og
+build:pico --copt=-g
+build:pico --@pico-sdk//bazel/config:PICO_STDIO_USB=True
+build:pico --aspects=@pico-sdk//tools:uf2_aspect.bzl%pico_uf2_aspect,//bzl:bin_aspect.bzl%pico_bin_aspect
+build:pico --output_groups=+pico_uf2_files,+pico_bin_files
