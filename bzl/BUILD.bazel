@@ -1,7 +1,4 @@
 """Bazel build configuration settings for SSI Onboarding '26
-
-Defines config_setting targets used in select() blocks throughout the build
-to conditionally include hardware drivers vs mock implementations.
 """
 
 package(default_visibility = ["//visibility:public"])
