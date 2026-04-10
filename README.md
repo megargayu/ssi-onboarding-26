@@ -21,6 +21,10 @@ If you haven't already, please read [`ONBOARDING.md`](https://github.com/stanfor
 
 Don't worry if you don't understand this all - all of this code is already written for SAMWISE, so you may never need to interact with these components! It's still good to have an idea of what each thing does.
 
+## Installation
+
+If you haven't already, please refer to the [original `ONBOARDING.md` doc](https://github.com/stanford-ssi/samwise-flight-software/blob/main/docs/ONBOARDING.md) for how to install all required components.
+
 ## Code
 
 Put this in `src/main.c`:
@@ -56,7 +60,7 @@ Which should generate a bunch of folders, including most importantly `bazel-bin/
 
 1. Unplug your PICO
 2. Hold the BOOT button on your PICO
-3. While holding, plug it in. A window should pop up with a directory that corresponds to the PICO, or it should generally be available in Finder/Windows Explorer/etc.
+3. While holding, plug it in. A window should pop up with a directory that corresponds to the PICO, or it should generally be available in Finder/Windows Explorer/etc. On Mac, a drive called "RP2350" or similar should appear on your desktop.
 4. Copy `bazel-bin/ssi-onboarding-26.uf2` into the drive that shows up.
 5. The folder should close almost immediately, and after the pico reboots, the light should start to blink!
 
@@ -66,20 +70,10 @@ If all of this works, success!
 
 If you are not all about that drag-and-drop life:
 
-1. Install [`picotool`](https://github.com/raspberrypi/pico-sdk-tools/releases) from releases for your computer.
-   - Linux: I recommend putting this in `/usr/local/bin/picotool` and then adding `/usr/local/bin` to `PATH` if it's not there already.
-     - To check PATH, run `echo $PATH | grep /usr/local/bin`. If the output has a highlighted version of that string, then you don't need to do anything.
-     - To add to PATH, edit `~/.bashrc` or `~/.zshrc` if you are using `zsh`, and add the line:
-       ```bash
-       export PATH="/usr/local/bin:$PATH"
-       ```
-       Then restart your shell.
-   - Mac: `brew install picotool` should work.
-   - Windows: Should be similar to Linux, but I've never tried it before. (Good luck!)
-2. Unplug your PICO
-3. Hold the BOOT button on your PICO
-4. While holding, plug it in. A window should pop up with a directory that corresponds to the PICO, or it should generally be available in Finder/Windows Explorer/etc.
-5. In the repository, run:
+1. Unplug your PICO
+2. Hold the BOOT button on your PICO
+3. While holding, plug it in. A window should pop up with a directory that corresponds to the PICO, or it should generally be available in Finder/Windows Explorer/etc. On Mac, a drive called "RP2350" or similar should appear on your desktop.
+4. In the repository, run:
 
    ```bash
    picotool load bazel-bin/ssi-onboarding-26.uf2 -f
@@ -91,7 +85,7 @@ If you are not all about that drag-and-drop life:
 
    Additionally, if you are on `WSL`, you must use `usbipd` (see instructions below)
 
-Note this is cool but also useful. You no longer need to reattach and attach the stick now. If you repeat step 5 again and again, it will automatically force the pico to reboot and then flash the new code. Try it out yourself - edit `main.c` and try again! (Make sure to build first!).
+Note this is cool but also useful. You no longer need to reattach and attach the stick now. If you repeat step 5 again and again, it will automatically force the pico to reboot and then flash the new code. Try it out yourself - edit `main.c` and only run step 4 again! (Make sure to build first!).
 
 ## WSL2 Integration
 
@@ -103,7 +97,7 @@ Every time you connect the Pico and either want to `tio` or `picotool`, therefor
 
 1. Unplug your PICO
 2. Hold the BOOT button on your PICO
-3. While holding, plug it in. A window should pop up with a directory that corresponds to the PICO, or it should generally be available in Finder/Windows Explorer/etc.
+3. While holding, plug it in. A window should pop up with a directory that corresponds to the PICO, or it should generally be available in Finder/Windows Explorer/etc. On Mac, a drive called "RP2350" or similar should appear on your desktop.
 4. From powershell, run `usbipd list`. You should see a bunch of stuff, including:
 
 ```
@@ -152,20 +146,7 @@ Each `BUSID` is a port on your computer. Therefore, it usually is the same if yo
 
 What if we want to read logs in real time?
 
-1. Install `tio`:
-   - Mac: `brew install tio`
-   - Linux: `sudo snap install tio --classic`
-     - If you don't have `snap`, install it, for example, on Ubuntu:
-       ```bash
-       sudo apt update
-       sudo apt install snapd
-       ```
-     - Note you may have to add snap's bin to path - so in `.bazelrc` or `.zshrc`:
-       ```bash
-       export PATH="/snap/bin:$PATH"
-       ```
-   - Windows: No idea :)
-2. Now, let's edit `main.c` to actually log a counter:
+1. Now, let's edit `main.c` to actually log a counter:
 
    ```c
    #include "pico/stdlib.h"
@@ -189,28 +170,33 @@ What if we want to read logs in real time?
    }
    ```
 
-3. Now, before we flash, let's setup `tio` by running (in either a regular terminal or on WSL, a separate *Linux* terminal while still having the `usbipd attach` command running):
-    ```bash
-    tio /dev/ttyACM0
-    ``` 
-    (You may need to do `sudo`).
+2. Now, before we flash, let's setup `tio` by running (note you may have to add `sudo` to the start of any of these commands if you get a "permission denied"):
+   - Linux/WSL: It should be `tio /dev/ttyACM0`. If not, try repeating similar steps to Mac below, or just looking for an item under `/dev/` that appears when you plug in the pico.
+   - Mac: Try typing `tio /dev/tty.`, then pressing the "TAB" button. You should see a list of items appear - type in the item that starts with `usbmodem` and ends with some number.
 
-4. Now, either use method (a) or the cool version to build and flash the new code onto the pico.
-5. You should see something like this!:
-    ```
-    [17:56:05.115] Waiting for tty device..
-    [17:56:09.122] Connected to /dev/ttyACM0
-    Hello, world! Our counter is: 2
-    Hello, world! Our counter is: 3
-    Hello, world! Our counter is: 4
-    Hello, world! Our counter is: 5
-    Hello, world! Our counter is: 6
-    Hello, world! Our counter is: 7
-    Hello, world! Our counter is: 8
-    Hello, world! Our counter is: 9
-    Hello, world! Our counter is: 10
-    ```
+     If there are multiple options, try pressing tab before you plug in, and then pressing it after, and seeing which item appeared (which should be the correct one).
 
-    Note that sometimes the first few logs are not available as `tio` connects after the code already started running on the pico.
+     If nothing appears, but your pico is flashing, something is wrong with your port. Try using a different cord or flipping the USB-C Cable (yes, that sometimes works)!
 
+3. Now, either use method (a) or the cool version to build and flash the new code onto the pico.
+4. You should see something like this!:
 
+   ```
+   [17:56:05.115] Waiting for tty device..
+   [17:56:09.122] Connected to /dev/ttyACM0
+   Hello, world! Our counter is: 2
+   Hello, world! Our counter is: 3
+   Hello, world! Our counter is: 4
+   Hello, world! Our counter is: 5
+   Hello, world! Our counter is: 6
+   Hello, world! Our counter is: 7
+   Hello, world! Our counter is: 8
+   Hello, world! Our counter is: 9
+   Hello, world! Our counter is: 10
+   ```
+
+   Note that sometimes the first few logs are not available as `tio` connects after the code already started running on the pico.
+
+## Congrats!
+
+You've finished setting up and testing everything you need for SSI Sats! You can go back to the original [`ONBOARDING.md`](https://github.com/stanford-ssi/samwise-flight-software/blob/main/docs/ONBOARDING.md) doc to continue on to building the main repository!
